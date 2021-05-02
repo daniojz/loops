@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="principal_text_color">#E1E1E1</color>
+    <color name="secondary_text_color">#B7B5B5B5</color>
     <color name="ColorActionBarSearch">#FFFFFF</color>
 
     <color name="basic_brown_background">#9C3800</color>
@@ -17,7 +18,8 @@
     <color name="basic_lightBlue_background">#86F4FF</color>
     <color name="basic_red_background">#FF5C58</color>
 
+    <color name="icon_active_color">#FFFFFF</color>
+    <color name="icon_inactive_color">#FFFFFF</color>
 
-    <color name="subtitle_white">#B7B5B5B5</color>
 
 </resources>

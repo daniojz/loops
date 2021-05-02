@@ -35,6 +35,7 @@ import com.example.loops.ui.songList.SongListFragment
 import com.example.loops.viewModel.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.loops.model.Song
+import com.example.loops.ui.song.song
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener, PlayerControl, View.OnClickListener {
@@ -50,7 +51,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private lateinit var mService: MusicPlayerService
     private var bindState: Boolean = false
 
-    private val connection = object : ServiceConnection { //conexion que se usa para conectarse al servicio de MusicPlayer
+    private lateinit var selectedSong: Song
+
+    private val connection = object :
+        ServiceConnection { //conexion que se usa para conectarse al servicio de MusicPlayer
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
@@ -79,16 +83,18 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         readPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
-    private fun init(){
+    private fun init() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         setNavController()
         initMusicPlayerService()
 
-        songListFragment.getClickedSong().observe(this, Observer { it -> it?.let {
-            showControlMusicCard(true, it)
-            playSong(it.contentUri.toString())
-        }
+        songListFragment.getClickedSong().observe(this, Observer { it ->
+            it?.let {
+                this.selectedSong = it
+                showControlMusicCard(true, it)
+                playSong(it.contentUri.toString())
+            }
         })
 
         setRandomBackground()
@@ -97,13 +103,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         lateinit var selectedFragment: Fragment
 
-        when(item.itemId){
+        when (item.itemId) {
             R.id.navigation_home -> selectedFragment = homeFragment
             R.id.navigation_songsList -> selectedFragment = songListFragment
             R.id.navigation_albums -> selectedFragment = albumsFragment
         }
 
-        supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, selectedFragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, selectedFragment)
+            .commit()
 
         return true
     }
@@ -118,7 +125,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     }
 
-    private fun setNavController(){
+    private fun setNavController() {
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         navView.setOnNavigationItemSelectedListener(this)
 
@@ -126,11 +133,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         songListFragment = SongListFragment()
         albumsFragment = AlbumsFragment()
 
-        supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, homeFragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, homeFragment)
+            .commit()
 
     }
 
-    private fun initMusicPlayerService(){
+    private fun initMusicPlayerService() {
 //        Intent(this, MusicPlayerService::class.java).also {
 //            startService(it)
 //        }
@@ -142,7 +150,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
 
-    private fun showControlMusicCard(state: Boolean, song: Song){
+    private fun showControlMusicCard(state: Boolean, song: Song) {
         cardView = findViewById<CardView>(R.id.cardControl)
         val animation: Animation
 
@@ -157,7 +165,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
         cardView.findViewById<ImageButton>(R.id.ib_play_pause).also {
             it.setOnClickListener(this)
-            if (!mService.isPlaying()){
+            if (!mService.isPlaying()) {
                 it.setImageResource(R.drawable.ic_pause_icon)
             }
         }
@@ -169,12 +177,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             cardView.isGone = false
             cardView.isVisible = true
             cardView.startAnimation(animation)
-        } else{
+        } else {
             animation = AnimationUtils.loadAnimation(this, R.anim.anim_hide)
             cardView.isGone = true
             cardView.startAnimation(animation)
         }
-
 
 
     }
@@ -192,12 +199,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     override fun resumeSong() {
-        if (!mService.isPlaying()){
+        if (!mService.isPlaying()) {
             mService.resumeSong()
-            cardView.findViewById<ImageButton>(R.id.ib_play_pause).setImageResource(R.drawable.ic_pause_icon)
+            cardView.findViewById<ImageButton>(R.id.ib_play_pause)
+                .setImageResource(R.drawable.ic_pause_icon)
         } else {
             mService.pauseSong()
-            cardView.findViewById<ImageButton>(R.id.ib_play_pause).setImageResource(R.drawable.ic_play_icon)
+            cardView.findViewById<ImageButton>(R.id.ib_play_pause)
+                .setImageResource(R.drawable.ic_play_icon)
         }
     }
 
@@ -209,22 +218,29 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onClick(v: View?) {
         if (v != null) {
-            when(v.id){
+            when (v.id) {
                 R.id.ib_play_pause -> resumeSong()
                 R.id.ib_next -> nextSong()
                 R.id.ib_previous -> previusSong()
+                R.id.cardControl -> showSongFragment()
             }
         }
     }
 
     private fun setRandomBackground() {
-        var randomNumber =  (Math.random() * 5 + 1).toInt()
+        val randomNumber = (Math.random() * 5 + 1).toInt()
         Log.d("id", "bg_main_activity_$randomNumber")
-        var background:Drawable = ContextCompat.getDrawable(this,
-                resources.getIdentifier("bg_main_activity_$randomNumber", "drawable", this.packageName))!!
+        val background: Drawable = ContextCompat.getDrawable(
+            this,
+            resources.getIdentifier("bg_main_activity_$randomNumber", "drawable", this.packageName)
+        )!!
 
         this.findViewById<ConstraintLayout>(R.id.activity_container).background = background
     }
 
+    private fun showSongFragment() {
+        val songFragment = song(selectedSong)
+        supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, songFragment).commit()
+    }
 }
 
