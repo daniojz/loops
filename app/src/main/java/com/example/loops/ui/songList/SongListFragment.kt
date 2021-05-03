@@ -1,7 +1,5 @@
 package com.example.loops.ui.songList
 
-import android.annotation.SuppressLint
-import android.app.Application
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
@@ -57,7 +55,7 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
             savedInstanceState: Bundle?
     ): View? {
         fragmentView = inflater.inflate(R.layout.fragment_songlist, container, false)
-        (activity as AppCompatActivity?)!!.setSupportActionBar(fragmentView.findViewById(R.id.toolbar))
+        (activity as AppCompatActivity?)!!.setSupportActionBar(fragmentView.findViewById(R.id.toolbar_songFragment))
         setHasOptionsMenu(true) //indicamos a la activity host (MainActivity) que el fragmento tiene items de menu que quiere añadir
 
 

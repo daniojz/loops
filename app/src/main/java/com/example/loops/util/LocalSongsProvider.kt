@@ -47,7 +47,7 @@ object LocalSongsProvider {
                 val title = cursor.getString(titleColumn)
                 val track = cursor.getInt(trackColumn)
                 val year = cursor.getInt(yearColumn)
-                val duration = cursor.getInt(durationColumn)
+                val duration = cursor.getFloat(durationColumn)
                 val album = cursor.getString(albumColumn)
                 val albumId = cursor.getLong(albumIdColumn)
                 val artistId = cursor.getInt(artistIdColumn)
@@ -60,7 +60,7 @@ object LocalSongsProvider {
 
                 // Stores column values and the contentUri in a local object
                 // that represents the media file.
-                allDeviceSongs.add(Song(id, contentUri, title, track, year, duration, album, artistId, albumId, artist))
+                allDeviceSongs.add(Song(id, contentUri.toString(), title, track, year, duration, album, artistId, albumId, artist))
             }
         }
 

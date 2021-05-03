@@ -12,11 +12,12 @@
     <color name="secondary_text_color">#B7B5B5B5</color>
     <color name="ColorActionBarSearch">#FFFFFF</color>
 
-    <color name="basic_brown_background">#9C3800</color>
-    <color name="basic_green_background">#A2FF92</color>
-    <color name="basic_blue_background">#5A91CD</color>
-    <color name="basic_lightBlue_background">#86F4FF</color>
-    <color name="basic_red_background">#FF5C58</color>
+    <color name="brown_background">#9C3800</color>
+    <color name="green_background">#A2FF92</color>
+    <color name="blue_background">#5A91CD</color>
+    <color name="lightBlue_background">#86F4FF</color>
+    <color name="red_background">#FF5C58</color>
+    <color name="grey_fragment_background">#606060</color>
 
     <color name="icon_active_color">#FFFFFF</color>
     <color name="icon_inactive_color">#FFFFFF</color>

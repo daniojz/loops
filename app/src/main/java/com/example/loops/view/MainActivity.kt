@@ -26,7 +26,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.loops.R
-import com.example.loops.model.BindMusicPlayerService
 import com.example.loops.model.PlayerControl
 import com.example.loops.services.MusicPlayerService
 import com.example.loops.ui.albums.AlbumsFragment
@@ -35,7 +34,6 @@ import com.example.loops.ui.songList.SongListFragment
 import com.example.loops.viewModel.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.loops.model.Song
-import com.example.loops.ui.song.song
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener, PlayerControl, View.OnClickListener {
@@ -47,7 +45,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private lateinit var albumsFragment: AlbumsFragment
     private lateinit var cardView: CardView
 
-    private lateinit var bindMusicPlayerService: BindMusicPlayerService
     private lateinit var mService: MusicPlayerService
     private var bindState: Boolean = false
 
@@ -93,7 +90,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             it?.let {
                 this.selectedSong = it
                 showControlMusicCard(true, it)
-                playSong(it.contentUri.toString())
+                playSong(it.contentUri)
             }
         })
 
@@ -239,8 +236,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     private fun showSongFragment() {
-        val songFragment = song(selectedSong)
-        supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, songFragment).commit()
+        val intent = Intent(this, SongActivity::class.java)
+        intent.putExtra("song", selectedSong)
+        startActivity(intent)
     }
 }
 

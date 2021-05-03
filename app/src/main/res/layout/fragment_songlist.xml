@@ -8,7 +8,7 @@
 
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_songFragment"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_margin="0dp"
@@ -28,8 +28,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        android:layout_below="@+id/toolbar"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_songFragment"
+        android:layout_below="@+id/toolbar_songFragment"
         android:layout_marginBottom="15dp">
 
         <TextView

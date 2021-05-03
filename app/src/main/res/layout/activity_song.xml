@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.SongActivity"
+    android:background="@drawable/bg_song_fragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_songActivity"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_margin="0dp"
+            android:background="#00000000"
+            android:elevation="0dp"
+            android:padding="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title=""/>
+
+        <ImageButton
+            android:id="@+id/btn_back_songActivity"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#00FFFFFF"
+            android:src="@drawable/abc_vector_test"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_songActivity">
+
+        </ImageButton>
+        <ImageView
+            android:id="@+id/iv_song_art_songActivity"
+            android:layout_width="270dp"
+            android:layout_height="270dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="80dp"
+            android:background="@drawable/bg_standard_cover_song"
+            android:src="@drawable/ic_standard_image_song"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_songActivity">
+
+        </ImageView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="210dp"
+            android:paddingLeft="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/title_song_songActivity"
+                android:layout_width="300dp"
+                android:layout_height="25dp"
+                android:fontFamily="@font/roboto_medium"
+                android:paddingLeft="10dp"
+                android:text="Title of the song"
+                android:textColor="@color/principal_text_color"
+                android:textSize="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever">
+
+            </TextView>
+
+            <TextView
+                android:id="@+id/artist_name_songActivity"
+                android:layout_width="280dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/roboto_medium"
+                android:paddingLeft="10dp"
+                android:text="Title of the song"
+                android:textColor="@color/secondary_text_color"
+                android:textSize="14dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title_song_songActivity"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"/>
+
+            <ImageButton
+                android:id="@+id/btn_favourite_songActivity"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="30dp"
+                android:background="#00000000"
+                android:src="@drawable/ic_favorite_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.600"
+                app:layout_constraintStart_toEndOf="@+id/artist_name_songActivity"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_song_progress"
+                android:layout_width="370dp"
+                android:layout_height="10dp"
+                android:value="20.0"
+                android:valueFrom="0.0"
+                android:valueTo="100.0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/artist_name_songActivity"
+                app:thumbColor="@color/white"
+                app:thumbRadius="5dp"
+                app:trackColorActive="@color/white"
+                app:trackColorInactive="#19FFFFFF"
+                app:trackHeight="3dp" />
+
+            <ImageButton
+                android:id="@+id/btn_play_pause_songActivity"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:background="#00000000"
+                android:src="@drawable/ic_big_play_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.475"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/slider_song_progress" />
+
+            <ImageButton
+                android:id="@+id/btn_previous_songActivity"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:background="#00000000"
+                android:src="@drawable/ic_big_previous_icon"
+                app:layout_constraintEnd_toStartOf="@+id/btn_play_pause_songActivity"
+                app:layout_constraintTop_toBottomOf="@+id/slider_song_progress" />
+
+            <ImageButton
+                android:id="@+id/btn_next_songActivity"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:background="#00000000"
+                android:src="@drawable/ic_big_next_icon"
+                app:layout_constraintStart_toEndOf="@+id/btn_play_pause_songActivity"
+                app:layout_constraintTop_toBottomOf="@+id/slider_song_progress" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
