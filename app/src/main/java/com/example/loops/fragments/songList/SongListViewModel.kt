@@ -1,6 +1,5 @@
-package com.example.loops.ui.songList
+package com.example.loops.fragments.songList
 
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 import com.example.loops.adapter.CustomAdapterSongList

@@ -1,4 +1,4 @@
-package com.example.loops.ui.albums
+package com.example.loops.fragments.albums
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,21 +17,6 @@ import com.example.loops.R
 class AlbumsFragment : Fragment() {
 
     private lateinit var notificationsViewModel: AlbumsViewModel
-
-    override fun <I : Any?, O : Any?> registerForActivityResult(
-        contract: ActivityResultContract<I, O>,
-        callback: ActivityResultCallback<O>
-    ): ActivityResultLauncher<I> {
-        TODO("Not yet implemented")
-    }
-
-    override fun <I : Any?, O : Any?> registerForActivityResult(
-        contract: ActivityResultContract<I, O>,
-        registry: ActivityResultRegistry,
-        callback: ActivityResultCallback<O>
-    ): ActivityResultLauncher<I> {
-        TODO("Not yet implemented")
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater,

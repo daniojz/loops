@@ -1,4 +1,4 @@
-package com.example.loops.ui.songList
+package com.example.loops.fragments.songList
 
 import android.graphics.Color
 import android.os.Bundle
@@ -32,22 +32,6 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
     private var songView: CardView? = null
 
     private lateinit var adapter: CustomAdapterSongList
-
-    override fun <I : Any?, O : Any?> registerForActivityResult(
-            contract: ActivityResultContract<I, O>,
-            callback: ActivityResultCallback<O>
-    ): ActivityResultLauncher<I> {
-        TODO("Not yet implemented")
-    }
-
-    override fun <I : Any?, O : Any?> registerForActivityResult(
-            contract: ActivityResultContract<I, O>,
-            registry: ActivityResultRegistry,
-            callback: ActivityResultCallback<O>
-    ): ActivityResultLauncher<I> {
-        TODO("Not yet implemented")
-    }
-
 
     override fun onCreateView(
             inflater: LayoutInflater,

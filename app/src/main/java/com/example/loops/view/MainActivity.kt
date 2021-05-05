@@ -1,10 +1,12 @@
 package com.example.loops.view
 
 import android.Manifest
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.IBinder
@@ -28,12 +30,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.loops.R
 import com.example.loops.model.PlayerControl
 import com.example.loops.services.MusicPlayerService
-import com.example.loops.ui.albums.AlbumsFragment
-import com.example.loops.ui.home.HomeFragment
-import com.example.loops.ui.songList.SongListFragment
+import com.example.loops.fragments.albums.AlbumsFragment
+import com.example.loops.fragments.home.HomeFragment
+import com.example.loops.fragments.songList.SongListFragment
 import com.example.loops.viewModel.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.loops.model.Song
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener, PlayerControl, View.OnClickListener {
@@ -65,23 +68,47 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
     }
 
-    val readPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-
         init()
+    }
 
-        readPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    override fun onStart() {
+        super.onStart()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+            val readPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+            readPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+    }
+
+    private fun welcomeInit(){
+
+        var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // There are no request codes
+                val data: Intent? = result.data
+                if (data != null) {
+                    if (FirebaseAuth.getInstance().currentUser!=null){
+                        this.findViewById<TextView>(R.id.text_home_welcome).text = "Buenos dias " + FirebaseAuth.getInstance().currentUser.displayName + "..."
+                    } else {
+                        this.findViewById<TextView>(R.id.text_home_welcome).text = "Buenos dias..."
+                    }                
+                }
+            }
+        }
+
+        resultLauncher.launch(Intent(this, AuthActivity::class.java))
+        //this.onPause()
     }
 
     private fun init() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        if (!mainViewModel.checkAuth()){
+            welcomeInit()
+        }
 
         setNavController()
         initMusicPlayerService()
@@ -103,7 +130,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         when (item.itemId) {
             R.id.navigation_home -> selectedFragment = homeFragment
             R.id.navigation_songsList -> selectedFragment = songListFragment
-            R.id.navigation_albums -> selectedFragment = albumsFragment
+            R.id.navigation_cloud_music -> selectedFragment = albumsFragment
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, selectedFragment)
@@ -145,7 +172,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
 
     }
-
 
     private fun showControlMusicCard(state: Boolean, song: Song) {
         cardView = findViewById<CardView>(R.id.cardControl)
@@ -240,5 +266,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         intent.putExtra("song", selectedSong)
         startActivity(intent)
     }
+
 }
 

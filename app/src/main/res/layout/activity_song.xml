@@ -9,7 +9,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="25dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_songActivity"
@@ -22,18 +23,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title=""/>
+            app:title="">
 
-        <ImageButton
-            android:id="@+id/btn_back_songActivity"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="#00FFFFFF"
-            android:src="@drawable/abc_vector_test"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar_songActivity">
+            <ImageButton
+                android:id="@+id/btn_back_songActivity"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#00FFFFFF"
+                android:src="@drawable/abc_vector_test"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_songActivity">
 
-        </ImageButton>
+            </ImageButton>
+        </androidx.appcompat.widget.Toolbar>
+
         <ImageView
             android:id="@+id/iv_song_art_songActivity"
             android:layout_width="270dp"
@@ -52,8 +55,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="210dp"
+            android:layout_height="220dp"
             android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -109,7 +113,7 @@
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/slider_song_progress"
-                android:layout_width="370dp"
+                android:layout_width="match_parent"
                 android:layout_height="10dp"
                 android:value="20.0"
                 android:valueFrom="0.0"
@@ -124,34 +128,85 @@
                 app:trackColorInactive="#19FFFFFF"
                 app:trackHeight="3dp" />
 
-            <ImageButton
-                android:id="@+id/btn_play_pause_songActivity"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:background="#00000000"
-                android:src="@drawable/ic_big_play_icon"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintVertical_bias="0"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.475"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/slider_song_progress" />
+                app:layout_constraintTop_toBottomOf="@+id/slider_song_progress"
+                android:paddingRight="16dp"
+                android:paddingLeft="16dp">
 
-            <ImageButton
-                android:id="@+id/btn_previous_songActivity"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:background="#00000000"
-                android:src="@drawable/ic_big_previous_icon"
-                app:layout_constraintEnd_toStartOf="@+id/btn_play_pause_songActivity"
-                app:layout_constraintTop_toBottomOf="@+id/slider_song_progress" />
+                <TextView
+                    android:id="@+id/song_duration_progress"
+                    android:layout_width="100dp"
+                    android:layout_height="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="0:01"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/principal_text_color">
 
-            <ImageButton
-                android:id="@+id/btn_next_songActivity"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:background="#00000000"
-                android:src="@drawable/ic_big_next_icon"
-                app:layout_constraintStart_toEndOf="@+id/btn_play_pause_songActivity"
-                app:layout_constraintTop_toBottomOf="@+id/slider_song_progress" />
+                </TextView>
+
+                <TextView
+                    android:id="@+id/song_duration_total"
+                    android:layout_width="100dp"
+                    android:layout_height="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="3:00"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/principal_text_color">
+
+                </TextView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
+                <ImageButton
+                    android:id="@+id/btn_play_pause_songActivity"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="#00000000"
+                    android:src="@drawable/ic_big_play_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.475"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/btn_previous_songActivity"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="#00000000"
+                    android:src="@drawable/ic_big_previous_icon"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_play_pause_songActivity"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/btn_next_songActivity"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="#00000000"
+                    android:src="@drawable/ic_big_next_icon"
+                    app:layout_constraintStart_toEndOf="@+id/btn_play_pause_songActivity"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

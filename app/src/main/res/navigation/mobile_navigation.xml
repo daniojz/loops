@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.loops.ui.home.HomeFragment"
+        android:name="com.example.loops.fragments.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_songsList"
-        android:name="com.example.loops.ui.songList.SongListFragment"
+        android:name="com.example.loops.fragments.songList.SongListFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_songlist" />
 
     <fragment
-        android:id="@+id/navigation_albums"
-        android:name="com.example.loops.ui.albums.AlbumsFragment"
+        android:id="@+id/navigation_cloud_music"
+        android:name="com.example.loops.fragments.albums.AlbumsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_albums" />
 </navigation>

@@ -7,7 +7,10 @@ import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
+import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.example.loops.R
@@ -59,8 +62,9 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
         songViewModel = ViewModelProvider(this).get(SongViewModel::class.java)
         selectedSong = intent.getSerializableExtra("song") as Song
 
-        showData()
+
         initMusicPlayerService()
+        showData()
     }
 
     private fun showData(){
@@ -70,17 +74,29 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
         }
         this.findViewById<TextView>(R.id.artist_name_songActivity).text = selectedSong.artistName
         this.findViewById<Slider>(R.id.slider_song_progress).valueTo = selectedSong.duration
+        this.findViewById<TextView>(R.id.song_duration_total).text = selectedSong.duration.toString()
+        if (!mService.isPlaying()) {
+            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_pause_icon)
+        } else {
+            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_big_play_icon)
+        }
+
+        this.findViewById<TextView>(R.id.btn_back_songActivity).setOnClickListener(this)
+        this.findViewById<TextView>(R.id.btn_play_pause_songActivity).setOnClickListener(this)
+        this.findViewById<TextView>(R.id.btn_next_songActivity).setOnClickListener(this)
+        this.findViewById<TextView>(R.id.btn_previous_songActivity).setOnClickListener(this)
+//        this.findViewById<TextView>(R.id.btn_favourite_songActivity).setOnClickListener(this)
 
     }
 
 
 
     override fun playSong(pathSong: String) {
-        TODO("Not yet implemented")
+        mService.playSong(pathSong)
     }
 
     override fun pauseSong() {
-        TODO("Not yet implemented")
+        mService.pauseSong()
     }
 
     override fun stopSong() {
@@ -88,7 +104,13 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
     }
 
     override fun resumeSong() {
-        TODO("Not yet implemented")
+        if (!mService.isPlaying()) {
+            mService.resumeSong()
+            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_pause_icon)
+        } else {
+            mService.pauseSong()
+            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_big_play_icon)
+        }
     }
 
     override fun nextSong() {
@@ -99,7 +121,12 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
         TODO("Not yet implemented")
     }
 
-    override fun onClick(p0: View?) {
-        TODO("Not yet implemented")
+    override fun onClick(v: View?) {
+        if (v != null) {
+            when (v.id){
+                R.id.btn_back_songActivity -> finish()
+                R.id.btn_play_pause_songActivity -> resumeSong()
+            }
+        }
     }
 }

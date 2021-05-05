@@ -12,8 +12,8 @@
         android:title="@string/title_dashboard" />
 
     <item
-        android:id="@+id/navigation_albums"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:id="@+id/navigation_cloud_music"
+        android:icon="@drawable/ics_cloud_music"
         android:title="@string/title_notifications" />
 
 </menu>

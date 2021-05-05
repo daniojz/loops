@@ -1,4 +1,4 @@
-package com.example.loops.ui.home
+package com.example.loops.fragments.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
