@@ -45,6 +45,7 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
             val binder = service as MusicPlayerService.LocalBinder
             mService = binder.getService()
             bindState = true
+            initPlayButton()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -62,7 +63,6 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
         songViewModel = ViewModelProvider(this).get(SongViewModel::class.java)
         selectedSong = intent.getSerializableExtra("song") as Song
 
-
         initMusicPlayerService()
         showData()
     }
@@ -75,21 +75,22 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
         this.findViewById<TextView>(R.id.artist_name_songActivity).text = selectedSong.artistName
         this.findViewById<Slider>(R.id.slider_song_progress).valueTo = selectedSong.duration
         this.findViewById<TextView>(R.id.song_duration_total).text = selectedSong.duration.toString()
-        if (!mService.isPlaying()) {
-            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_pause_icon)
-        } else {
-            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_big_play_icon)
-        }
 
-        this.findViewById<TextView>(R.id.btn_back_songActivity).setOnClickListener(this)
-        this.findViewById<TextView>(R.id.btn_play_pause_songActivity).setOnClickListener(this)
-        this.findViewById<TextView>(R.id.btn_next_songActivity).setOnClickListener(this)
-        this.findViewById<TextView>(R.id.btn_previous_songActivity).setOnClickListener(this)
+        this.findViewById<ImageButton>(R.id.btn_back_songActivity).setOnClickListener(this)
+        this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setOnClickListener(this)
+        this.findViewById<ImageButton>(R.id.btn_next_songActivity).setOnClickListener(this)
+        this.findViewById<ImageButton>(R.id.btn_previous_songActivity).setOnClickListener(this)
 //        this.findViewById<TextView>(R.id.btn_favourite_songActivity).setOnClickListener(this)
 
     }
 
-
+    private fun initPlayButton(){
+        if (!mService.isPlaying()) {
+            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_big_play_icon)
+        } else {
+            this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_pause_icon)
+        }
+    }
 
     override fun playSong(pathSong: String) {
         mService.playSong(pathSong)

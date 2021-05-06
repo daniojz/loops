@@ -9,9 +9,10 @@ import android.os.IBinder
 import android.util.Log
 import com.example.loops.model.PlayerControl
 import com.example.loops.model.Song
+import java.io.Serializable
 import java.net.URI
 
-class MusicPlayerService : Service(), PlayerControl {
+class MusicPlayerService : Service(), PlayerControl{
 
     private lateinit var player: MediaPlayer
     private lateinit var song: Song
