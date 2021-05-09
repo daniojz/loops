@@ -2,9 +2,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.movies2021.view.MainActivity">
-    <item android:id="@+id/search"
+    <item android:id="@+id/search_song"
         android:title="search"
         android:icon="@drawable/ic_search_icon"
         app:showAsAction="collapseActionView|ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
+    <item android:id="@+id/upload_song"
+        android:title="upload"
+        android:icon="@android:drawable/stat_sys_upload"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:visible="false" />
+
+    <item android:id="@+id/delete_song"
+        android:title="delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:visible="false" />
+
 </menu>

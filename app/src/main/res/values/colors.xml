@@ -22,5 +22,7 @@
     <color name="icon_active_color">#FFFFFF</color>
     <color name="icon_inactive_color">#FFFFFF</color>
 
+    <color name="selected_card_background">#36FFFFFF</color>
+    <color name="deselected_card_background">#00FFFFFF</color>
 
 </resources>

@@ -1,13 +1,14 @@
 package com.example.loops.fragments.songList
 
+import android.annotation.SuppressLint
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.ListView
 import android.widget.TextView
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
-import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.cardview.widget.CardView
@@ -21,17 +22,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.loops.R
 import com.example.loops.adapter.CustomAdapterSongList
 import com.example.loops.model.Song
+import com.google.firebase.auth.FirebaseAuth
+import java.io.File
 
 
 class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClickListener, CustomAdapterSongList.OnSongListener {
 
     private lateinit var songsListViewModel: SongListViewModel
-    private var song: MutableLiveData<Song> = MutableLiveData<Song>()
 
     private lateinit var fragmentView: View
-    private var songView: CardView? = null
+    private lateinit var toolbarMenu: Menu
+    private lateinit var recyclerView: RecyclerView
+
+    private var song: MutableLiveData<Song> = MutableLiveData<Song>()
+    private var selectedSongsList: ArrayList<Song> = ArrayList<Song>()
 
     private lateinit var adapter: CustomAdapterSongList
+
+    private var editMode = false
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -42,6 +50,8 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         (activity as AppCompatActivity?)!!.setSupportActionBar(fragmentView.findViewById(R.id.toolbar_songFragment))
         setHasOptionsMenu(true) //indicamos a la activity host (MainActivity) que el fragmento tiene items de menu que quiere añadir
 
+        toolbarMenu = fragmentView.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_songFragment).menu
+        recyclerView = fragmentView.findViewById(R.id.rv_deviceSongs)
 
         init()
 
@@ -54,17 +64,17 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         songsListViewModel = ViewModelProvider(this).get(SongListViewModel::class.java)
         songsListViewModel.showAllDeviceSongs(adapter, fragmentView)
 
-/*        //observador -> observa la variable MutableLiveData<List<Song>> de el viewModel, para que cuando cambie actualice la lista
-        songsListViewModel.getSongsList().observe(viewLifecycleOwner, Observer { it ->
-            it?.let {
-                songsListViewModel.showAllDeviceSongs()
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            if (editMode) {
+                editMode = false
+                adapter.editMode = false
             }
-        })*/
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_song_list, menu)
-        val menuItem = menu.findItem(R.id.search)
+        val menuItem = menu.findItem(R.id.search_song)
 
         if (menuItem != null) {
             val searchView = menuItem.actionView as SearchView
@@ -91,33 +101,71 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         return false
     }
 
+    override fun onSongClick(position: Int, itemView: View) {
+        if (!editMode) {
+            song.value = songsListViewModel.clickSong(position)
+        } else {
+            if (itemView.isSelected) {
+                deselectCard(itemView)
+            } else {
+                selectCard(itemView)
+            }
 
-    private fun setAdapter() {
-        adapter = activity?.let { CustomAdapterSongList(it.applicationContext, this, R.layout.custom_card_song, this) }!!
-        fragmentView.findViewById<RecyclerView>(R.id.rv_deviceSongs).layoutManager = LinearLayoutManager(fragmentView.context)
-        fragmentView.findViewById<RecyclerView>(R.id.rv_deviceSongs).adapter = adapter
+        }
+
+    }
+
+    override fun onLongSongClick(position: Int, itemView: View) = if (!editMode) {
+        editMode = true
+        adapter.editMode = true
+
+        menuEdit(true)
+        selectCard(itemView)
+    } else {
+        editMode = false
+        adapter.editMode = false
+
+        menuEdit(false)
     }
 
 
     override fun onClick(p0: View?) {
     }
 
-    override fun onSongClick(position: Int, itemView: View) {
-        songView?.findViewById<TextView>(R.id.title_song)?.setTextColor(ContextCompat.getColor(fragmentView.context, R.color.principal_text_color))
-        songView?.findViewById<TextView>(R.id.artist_name)?.setTextColor(ContextCompat.getColor(fragmentView.context, R.color.principal_text_color))
 
-        song.value = songsListViewModel.clickSong(position)
-
-        songView = itemView as CardView
-        itemView.findViewById<TextView>(R.id.title_song).setTextColor(Color.GREEN)
-        itemView.findViewById<TextView>(R.id.artist_name).setTextColor(Color.GREEN)
+    private fun setAdapter() {
+        adapter = activity?.let { CustomAdapterSongList(it.applicationContext, this, R.layout.custom_card_song, this) }!!
+        recyclerView.layoutManager = LinearLayoutManager(fragmentView.context)
+        recyclerView.adapter = adapter
     }
 
     fun getClickedSong(): LiveData<Song> {
         return song
     }
 
+    private fun selectCard(itemView: View) {
+        selectedSongsList.add(itemView.tag as Song)
+    }
 
+    private fun deselectCard(itemView: View) {
+        selectedSongsList.remove(itemView.tag as Song)
+    }
+
+    private fun menuEdit(menuEdit: Boolean){
+        if (menuEdit) {
+            toolbarMenu.findItem(R.id.delete_song).isVisible = true
+            toolbarMenu.findItem(R.id.upload_song).isVisible = true
+        } else{
+            toolbarMenu.findItem(R.id.delete_song).isVisible = false
+            toolbarMenu.findItem(R.id.upload_song).isVisible = false
+        }
+    }
+
+    fun uploadSongs(){
+        val emailAuth = FirebaseAuth.getInstance().currentUser.email
+
+
+    }
 
 
 }
