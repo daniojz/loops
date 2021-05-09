@@ -1,29 +1,21 @@
 package com.example.loops.fragments.songList
 
-import android.annotation.SuppressLint
-import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ListView
-import android.widget.TextView
-import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.selection.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.loops.R
 import com.example.loops.adapter.CustomAdapterSongList
 import com.example.loops.model.Song
 import com.google.firebase.auth.FirebaseAuth
-import java.io.File
 
 
 class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClickListener, CustomAdapterSongList.OnSongListener {
@@ -40,6 +32,8 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
     private lateinit var adapter: CustomAdapterSongList
 
     private var editMode = false
+
+    private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -64,12 +58,7 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         songsListViewModel = ViewModelProvider(this).get(SongListViewModel::class.java)
         songsListViewModel.showAllDeviceSongs(adapter, fragmentView)
 
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            if (editMode) {
-                editMode = false
-                adapter.editMode = false
-            }
-        }
+        trackSelectedItems()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -151,6 +140,26 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         selectedSongsList.remove(itemView.tag as Song)
     }
 
+    private fun trackSelectedItems(){
+        tracker = SelectionTracker.Builder<Long>(
+            "mySelection",
+            recyclerView,
+            ItemIdKeyProvider(recyclerView),
+            ItemLookup(recyclerView),
+            StorageStrategy.createLongStorage()
+        ).withSelectionPredicate(
+            SelectionPredicates.createSelectAnything()
+        ).build()
+
+        adapter.trackerSelection = tracker
+
+        tracker?.addObserver(object: SelectionTracker.SelectionObserver<Long>() {
+            override fun onSelectionChanged() {
+
+            }
+        })
+    }
+
     private fun menuEdit(menuEdit: Boolean){
         if (menuEdit) {
             toolbarMenu.findItem(R.id.delete_song).isVisible = true
@@ -163,9 +172,37 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
 
     fun uploadSongs(){
         val emailAuth = FirebaseAuth.getInstance().currentUser.email
-
-
     }
 
+
+
+
+    inner class ItemIdKeyProvider(private val recyclerView: RecyclerView)
+        : ItemKeyProvider<Long>(SCOPE_MAPPED) {
+
+        override fun getKey(position: Int): Long? {
+            return recyclerView.adapter?.getItemId(position)
+                ?: throw IllegalStateException("RecyclerView adapter is not set!")
+        }
+
+        override fun getPosition(key: Long): Int {
+            val viewHolder = recyclerView.findViewHolderForItemId(key)
+            return viewHolder?.layoutPosition ?: RecyclerView.NO_POSITION
+        }
+    }
+
+    inner class ItemLookup(private val rv: RecyclerView)
+        : ItemDetailsLookup<Long>() {
+        override fun getItemDetails(event: MotionEvent)
+                : ItemDetails<Long>? {
+
+            val view = rv.findChildViewUnder(event.x, event.y)
+            if(view != null) {
+                return (rv.getChildViewHolder(view) as CustomAdapterSongList.ViewHolder)
+                    .getItemDetails()
+            }
+            return null
+        }
+    }
 
 }

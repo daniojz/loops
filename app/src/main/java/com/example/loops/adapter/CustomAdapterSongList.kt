@@ -11,8 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.selection.ItemDetailsLookup
-import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.*
 import androidx.recyclerview.widget.RecyclerView
 import com.example.loops.R
 import com.example.loops.model.Song
@@ -32,7 +31,6 @@ class CustomAdapterSongList(
     private var playingSong = -1
 
     var trackerSelection: SelectionTracker<Long>? = null
-
 
     var editMode = false
 
@@ -58,6 +56,7 @@ class CustomAdapterSongList(
     override fun getItemId(position: Int): Long {
         return super.getItemId(position)
     }
+
 
     internal fun setSongs(songs: List<Song>) {
         this.ListSongs = songs
@@ -85,10 +84,6 @@ class CustomAdapterSongList(
                     artist_name.setTextColor(SecondaryColor)
                 }
             } else {
-                if (adapterPosition in selectedSongs)
-                    itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.selected_card_background))
-                else
-                    itemView.setBackgroundColor(Color.TRANSPARENT)
             }
 
         }
@@ -100,9 +95,7 @@ class CustomAdapterSongList(
                     override fun getSelectionKey(): Long? = itemId
                 }
 
-        fun bind(dataitem: Song, isActivated: Boolean = false, lifecycle: LifecycleOwner, onSongListener: OnSongListener) {
-            itemView.isActivated = isActivated
-
+        fun bind(dataitem: Song, isActivated: Boolean,  lifecycle: LifecycleOwner, onSongListener: OnSongListener) {
             title_song.text = dataitem.title
             artist_name.text = dataitem.artistName
             this.onSongListener = onSongListener
