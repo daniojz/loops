@@ -24,7 +24,7 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
 
     private lateinit var fragmentView: View
     private lateinit var toolbarMenu: Menu
-    private lateinit var recyclerView: RecyclerView
+    lateinit var recyclerView: RecyclerView
 
     private var song: MutableLiveData<Song> = MutableLiveData<Song>()
     private var selectedSongsList: ArrayList<Song> = ArrayList<Song>()
@@ -32,8 +32,6 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
     private lateinit var adapter: CustomAdapterSongList
 
     private var editMode = false
-
-    private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -57,8 +55,6 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
 
         songsListViewModel = ViewModelProvider(this).get(SongListViewModel::class.java)
         songsListViewModel.showAllDeviceSongs(adapter, fragmentView)
-
-        trackSelectedItems()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -104,17 +100,20 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
 
     }
 
-    override fun onLongSongClick(position: Int, itemView: View) = if (!editMode) {
-        editMode = true
-        adapter.editMode = true
+    override fun onLongSongClick(position: Int, itemView: View){
+        if (!editMode) {
+            editMode = true
+            adapter.editMode = true
 
-        menuEdit(true)
-        selectCard(itemView)
-    } else {
-        editMode = false
-        adapter.editMode = false
+            menuEdit(true)
+            selectCard(itemView)
+        } else {
+            editMode = false
+            adapter.editMode = false
 
-        menuEdit(false)
+            menuEdit(false)
+            deselectAllCards()
+        }
     }
 
 
@@ -140,24 +139,8 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         selectedSongsList.remove(itemView.tag as Song)
     }
 
-    private fun trackSelectedItems(){
-        tracker = SelectionTracker.Builder<Long>(
-            "mySelection",
-            recyclerView,
-            ItemIdKeyProvider(recyclerView),
-            ItemLookup(recyclerView),
-            StorageStrategy.createLongStorage()
-        ).withSelectionPredicate(
-            SelectionPredicates.createSelectAnything()
-        ).build()
-
-        adapter.trackerSelection = tracker
-
-        tracker?.addObserver(object: SelectionTracker.SelectionObserver<Long>() {
-            override fun onSelectionChanged() {
-
-            }
-        })
+    private fun deselectAllCards() {
+        selectedSongsList.removeAll { true }
     }
 
     private fun menuEdit(menuEdit: Boolean){
@@ -174,35 +157,5 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         val emailAuth = FirebaseAuth.getInstance().currentUser.email
     }
 
-
-
-
-    inner class ItemIdKeyProvider(private val recyclerView: RecyclerView)
-        : ItemKeyProvider<Long>(SCOPE_MAPPED) {
-
-        override fun getKey(position: Int): Long? {
-            return recyclerView.adapter?.getItemId(position)
-                ?: throw IllegalStateException("RecyclerView adapter is not set!")
-        }
-
-        override fun getPosition(key: Long): Int {
-            val viewHolder = recyclerView.findViewHolderForItemId(key)
-            return viewHolder?.layoutPosition ?: RecyclerView.NO_POSITION
-        }
-    }
-
-    inner class ItemLookup(private val rv: RecyclerView)
-        : ItemDetailsLookup<Long>() {
-        override fun getItemDetails(event: MotionEvent)
-                : ItemDetails<Long>? {
-
-            val view = rv.findChildViewUnder(event.x, event.y)
-            if(view != null) {
-                return (rv.getChildViewHolder(view) as CustomAdapterSongList.ViewHolder)
-                    .getItemDetails()
-            }
-            return null
-        }
-    }
 
 }

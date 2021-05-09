@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="0dp"
     app:cardElevation="0dp"
-    android:background="@drawable/bgs_song_cards"
+    app:cardBackgroundColor="@color/deselected_card_background"
     card_view:cardUseCompatPadding="false"
     card_view:contentPadding="0dp"
     android:layout_marginTop="10dp">
@@ -44,7 +44,7 @@
             android:textColor="@color/principal_text_color"
             android:fontFamily="@font/roboto_medium"
             android:textSize="11dp"
-            android:maxLength="32"
+            android:maxLength="40"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.296"
             app:layout_constraintStart_toEndOf="@+id/iv_image_song"
@@ -63,7 +63,7 @@
             android:fontFamily="@font/roboto_light"
             android:textSize="13dp"
             android:text="artist_name"
-            android:maxLength="28">
+            android:maxLength="40">
 
         </TextView>
 

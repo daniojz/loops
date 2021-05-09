@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.example.loops.R
 import com.example.loops.viewModel.AuthViewModel
@@ -33,19 +32,18 @@ class AuthActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         this.findViewById<TextView>(R.id.tv_message_login).text = ""
-        var username = this.findViewById<TextView>(R.id.et_username).text
+        var email = this.findViewById<TextView>(R.id.et_email).text
         var password = this.findViewById<TextView>(R.id.et_password).text
         if (v != null) {
-            if(username.isNotEmpty() && password.isNotEmpty()) {
                 if(v.id == R.id.login){
-                    loginUser(username.toString(), password.toString())
+                    if(email.isNotEmpty() && password.isNotEmpty()) {
+                        loginUser(email.toString(), password.toString())
+                    }else {
+                        this.findViewById<TextView>(R.id.tv_message_login).text = "Debe de rellenar todos los campos"
+                    }
                 } else {
-                    registerUser(username.toString(), password.toString())
+                    registerUser()
                 }
-            }else {
-                this.findViewById<TextView>(R.id.tv_message_login).text = "Debe de rellenar todos los campos"
-            }
-
         }
     }
 
@@ -64,19 +62,10 @@ class AuthActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun registerUser(username: String, password:String){
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(
-                username,
-                password).addOnCompleteListener {
-            if (it.isSuccessful){
-                this.findViewById<TextView>(R.id.tv_message_login).also {
-                    it.text = "Se ha registrado correctamente!"
-                }
-                successFinish(username)
-            } else {
-                showAlert()
-            }
-        }
+    private fun registerUser(){
+        val intent = Intent(this, RegisterActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun successFinish(username: String) {
@@ -94,6 +83,5 @@ class AuthActivity : AppCompatActivity(), View.OnClickListener {
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
-
 
 }

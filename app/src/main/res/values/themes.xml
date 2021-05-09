@@ -17,25 +17,29 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-        <style name="Theme.Loops.NoActionBar">
-            <item name="windowActionBar">false</item>
-            <item name="windowNoTitle">true</item>
-        </style>
+    <style name="Theme.Loops.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
-        <style name="Theme.Loops.NoActionBar.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
-            <item name="windowActionBar">false</item>
-            <item name="windowActionBarOverlay">false</item>
-            <item name="android:windowActionBarOverlay">false</item>
-            <item name="android:elevation">0dp</item>
-        </style>
+    <style name="Theme.Loops.NoActionBar.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowActionBarOverlay">false</item>
+        <item name="android:windowActionBarOverlay">false</item>
+        <item name="android:elevation">0dp</item>
+    </style>
 
-        <style name="Theme.Loops.SearchToolbar" parent="ThemeOverlay.AppCompat.Light" >
-            <item name="android:windowActionBarOverlay">true</item>
-            <item name="windowActionBarOverlay">true</item>
-            <item name="android:elevation">0dp</item>
-            <item name="android:editTextColor">@color/ColorActionBarSearch</item>
-            <item name="searchViewStyle">@style/Theme.Design.Light</item>
-        </style>
+    <style name="Theme.Loops.SearchToolbar" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:editTextColor">@color/ColorActionBarSearch</item>
+        <item name="searchViewStyle">@style/Theme.Design.Light</item>
+    </style>
+
+    <style name="Theme.Loops.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.Loops.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
 </resources>

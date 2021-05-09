@@ -30,33 +30,18 @@ class CustomAdapterSongList(
     private var selectedSongs = mutableSetOf<Int>()
     private var playingSong = -1
 
-    var trackerSelection: SelectionTracker<Long>? = null
-
     var editMode = false
-
-    init {
-        setHasStableIds(true)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
             LayoutInflater.from(parent.context).inflate(layoutId, parent, false), context
     )
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int){
-        trackerSelection?.let {
-            return holder.bind(ListSongs[position], it.isSelected(position.toLong()), lifecycle, onSongListener)
-        }
-    }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(ListSongs[position], lifecycle, onSongListener)
 
 
     override fun getItemCount(): Int {
         return ListSongs.size
     }
-
-    override fun getItemId(position: Int): Long {
-        return super.getItemId(position)
-    }
-
 
     internal fun setSongs(songs: List<Song>) {
         this.ListSongs = songs
@@ -74,28 +59,7 @@ class CustomAdapterSongList(
         private var PrincipalColor =  ContextCompat.getColor(context, R.color.principal_text_color)
         private var SecondaryColor =  ContextCompat.getColor(context, R.color.secondary_text_color)
 
-        private fun updateViewStyle(){
-            if(!editMode) {
-                if (adapterPosition == playingSong) {
-                    title_song.setTextColor(Color.GREEN)
-                    artist_name.setTextColor(Color.GREEN)
-                } else {
-                    title_song.setTextColor(PrincipalColor)
-                    artist_name.setTextColor(SecondaryColor)
-                }
-            } else {
-            }
-
-        }
-
-
-        fun getItemDetails(): ItemDetailsLookup.ItemDetails<Long> =
-                object : ItemDetailsLookup.ItemDetails<Long>() {
-                    override fun getPosition(): Int = adapterPosition
-                    override fun getSelectionKey(): Long? = itemId
-                }
-
-        fun bind(dataitem: Song, isActivated: Boolean,  lifecycle: LifecycleOwner, onSongListener: OnSongListener) {
+        fun bind(dataitem: Song, lifecycle: LifecycleOwner, onSongListener: OnSongListener) {
             title_song.text = dataitem.title
             artist_name.text = dataitem.artistName
             this.onSongListener = onSongListener
@@ -114,8 +78,32 @@ class CustomAdapterSongList(
             itemView.setOnLongClickListener(this)
         }
 
+        private fun updateViewStyle(){
+                if (adapterPosition == playingSong) {
+                    title_song.setTextColor(Color.GREEN)
+                    artist_name.setTextColor(Color.GREEN)
+                } else {
+                    title_song.setTextColor(PrincipalColor)
+                    artist_name.setTextColor(SecondaryColor)
+                }
+
+                if (adapterPosition in selectedSongs){
+                    itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.selected_card_background))
+                } else {
+                    itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.deselected_card_background))
+                }
+        }
+/*
+        fun resetLastViewStyle(itemView: View){
+            if (playingSong!=-1){
+                title_song.setTextColor(PrincipalColor)
+                artist_name.setTextColor(SecondaryColor)
+            }
+        }
+*/
         override fun onClick(v: View?) {
             if (v != null) {
+               // resetLastViewStyle()
                 val lastPlayingSong: Int = playingSong
                 onSongListener.onSongClick(adapterPosition, v)
 
@@ -125,23 +113,24 @@ class CustomAdapterSongList(
                 }else {
                     if (adapterPosition in selectedSongs) selectedSongs.remove(adapterPosition) else selectedSongs.add(adapterPosition)
                 }
+
                 updateViewStyle()
             }
         }
+
+
 
         override fun onLongClick(v: View?): Boolean {
             if (v != null) {
                 if (editMode){
                     selectedSongs.removeAll{true}
-                    updateViewStyle()
                     onSongListener.onLongSongClick(adapterPosition, v)
-                    notifyDataSetChanged()
                 }else {
-                    onSongListener.onLongSongClick(adapterPosition, v)
                     selectedSongs.add(adapterPosition)
+                    onSongListener.onLongSongClick(adapterPosition, v)
                     updateViewStyle()
-                    notifyDataSetChanged()
                 }
+                notifyDataSetChanged()
                 return true
             }
             return false
