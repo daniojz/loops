@@ -2,6 +2,7 @@ package com.example.loops.viewModel
 
 import androidx.lifecycle.ViewModel
 import com.example.loops.model.PlayerControl
+import com.example.loops.model.Song
 import com.example.loops.services.MusicPlayerService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -22,7 +23,7 @@ class MainViewModel() : ViewModel(), PlayerControl {
         return false
     }
 
-    override fun playSong(pathSong: String) {
+    override fun playSong(song: Song) {
         TODO("Not yet implemented")
     }
 

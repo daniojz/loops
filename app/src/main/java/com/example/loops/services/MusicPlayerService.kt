@@ -15,10 +15,11 @@ import java.net.URI
 class MusicPlayerService : Service(), PlayerControl{
 
     private lateinit var player: MediaPlayer
-    private lateinit var song: Song
+    lateinit var song: Song
     private val binder = LocalBinder()
 
-    private var isPlaying = false
+    var isActive = false
+    var isPlaying = false
 
     override fun onCreate() {
         super.onCreate()
@@ -45,13 +46,16 @@ class MusicPlayerService : Service(), PlayerControl{
         fun getService(): MusicPlayerService = this@MusicPlayerService // para que el "cliente" pueda utilizar sus metodos publicos
     }
 
-    override fun playSong(pathSong: String) {
+    override fun playSong( song: Song) {
         if (isPlaying){
             player.stop()
         }
-        player = MediaPlayer.create(this, Uri.parse(pathSong))
+        player = MediaPlayer.create(this, Uri.parse(song.contentUri))
         player.start()
+
         isPlaying = true
+        isActive = true
+        this.song = song
     }
 
     override fun pauseSong() {
@@ -75,10 +79,6 @@ class MusicPlayerService : Service(), PlayerControl{
 
     override fun previusSong() {
         TODO("Not yet implemented")
-    }
-
-    fun isPlaying(): Boolean {
-        return isPlaying
     }
 
 }

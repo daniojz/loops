@@ -85,15 +85,15 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
     }
 
     private fun initPlayButton(){
-        if (!mService.isPlaying()) {
+        if (!mService.isPlaying) {
             this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_big_play_icon)
         } else {
             this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_pause_icon)
         }
     }
 
-    override fun playSong(pathSong: String) {
-        mService.playSong(pathSong)
+    override fun playSong(song: Song) {
+        mService.playSong(song)
     }
 
     override fun pauseSong() {
@@ -105,7 +105,7 @@ class SongActivity : AppCompatActivity(), PlayerControl, View.OnClickListener{
     }
 
     override fun resumeSong() {
-        if (!mService.isPlaying()) {
+        if (!mService.isPlaying) {
             mService.resumeSong()
             this.findViewById<ImageButton>(R.id.btn_play_pause_songActivity).setImageResource(R.drawable.ic_pause_icon)
         } else {

@@ -10,15 +10,11 @@
     <item android:id="@+id/upload_song"
         android:title="upload"
         android:icon="@android:drawable/stat_sys_upload"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:visible="false" />
 
     <item android:id="@+id/delete_song"
         android:title="delete"
         android:icon="@android:drawable/ic_menu_delete"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:visible="false" />
 
 </menu>

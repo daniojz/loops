@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_cloud_music"
-        android:name="com.example.loops.fragments.albums.AlbumsFragment"
+        android:name="com.example.loops.fragments.cloudSongList.cloudSongListFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_albums" />
+        tools:layout="@layout/fragment_cloudSongList" />
 </navigation>

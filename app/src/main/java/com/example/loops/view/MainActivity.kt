@@ -1,13 +1,13 @@
 package com.example.loops.view
 
 import android.Manifest
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -21,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -28,15 +29,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.loops.R
-import com.example.loops.model.PlayerControl
-import com.example.loops.services.MusicPlayerService
-import com.example.loops.fragments.albums.AlbumsFragment
+import com.example.loops.fragments.cloudSongList.cloudSongListFragment
 import com.example.loops.fragments.home.HomeFragment
 import com.example.loops.fragments.songList.SongListFragment
+import com.example.loops.model.PlayerControl
+import com.example.loops.model.Song
+import com.example.loops.services.MusicPlayerService
 import com.example.loops.viewModel.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.example.loops.model.Song
-import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener, PlayerControl, View.OnClickListener {
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     private lateinit var homeFragment: HomeFragment
     private lateinit var songListFragment: SongListFragment
-    private lateinit var albumsFragment: AlbumsFragment
+    private lateinit var albumsFragment: cloudSongListFragment
     private lateinit var cardView: CardView
 
     private lateinit var mService: MusicPlayerService
@@ -61,6 +61,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             val binder = service as MusicPlayerService.LocalBinder
             mService = binder.getService()
             bindState = true
+
+            if (mService.isActive){
+                showControlMusicCard(mService.isPlaying, mService.song)
+            }
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -81,26 +85,29 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             val readPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
             readPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //Verifica permisos para Android 6.0+
+            val permissionCheck = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                Log.d("Mensaje", "No se tiene permiso para leer.")
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    225
+                )
+            } else {
+                Log.d("Mensaje", "Se tiene permiso para leer!")
+            }
+        }
     }
 
     private fun welcomeInit(){
-
-        var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // There are no request codes
-                val data: Intent? = result.data
-                if (data != null) {
-                    if (FirebaseAuth.getInstance().currentUser!=null){
-                        this.findViewById<TextView>(R.id.text_home_welcome).text = "Buenos dias " + FirebaseAuth.getInstance().currentUser.displayName + "..."
-                    } else {
-                        this.findViewById<TextView>(R.id.text_home_welcome).text = "Buenos dias..."
-                    }                
-                }
-            }
-        }
-
-        resultLauncher.launch(Intent(this, AuthActivity::class.java))
-        //this.onPause()
+        val intent = Intent(this, AuthActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun init() {
@@ -108,20 +115,20 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         if (!mainViewModel.checkAuth()){
             welcomeInit()
+        } else {
+            conectMusicPlayerService()
+            setNavController()
+
+            songListFragment.getClickedSong().observe(this, Observer { it ->
+                it?.let {
+                    this.selectedSong = it
+                    showControlMusicCard(true, it)
+                    playSong(it)
+                }
+            })
+
+            setRandomBackground()
         }
-
-        setNavController()
-        initMusicPlayerService()
-
-        songListFragment.getClickedSong().observe(this, Observer { it ->
-            it?.let {
-                this.selectedSong = it
-                showControlMusicCard(true, it)
-                playSong(it.contentUri)
-            }
-        })
-
-        setRandomBackground()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -155,14 +162,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         homeFragment = HomeFragment()
         songListFragment = SongListFragment()
-        albumsFragment = AlbumsFragment()
+        albumsFragment = cloudSongListFragment()
 
         supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, homeFragment)
             .commit()
 
     }
 
-    private fun initMusicPlayerService() {
+    private fun conectMusicPlayerService() {
 //        Intent(this, MusicPlayerService::class.java).also {
 //            startService(it)
 //        }
@@ -188,7 +195,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
         cardView.findViewById<ImageButton>(R.id.ib_play_pause).also {
             it.setOnClickListener(this)
-            if (!mService.isPlaying()) {
+            if (!mService.isPlaying) {
                 it.setImageResource(R.drawable.ic_pause_icon)
             }
         }
@@ -209,8 +216,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     }
 
-    override fun playSong(pathSong: String) {
-        mService.playSong(pathSong)
+    override fun playSong(song: Song) {
+        mService.playSong(song)
     }
 
     override fun pauseSong() {
@@ -222,7 +229,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     override fun resumeSong() {
-        if (!mService.isPlaying()) {
+        if (!mService.isPlaying) {
             mService.resumeSong()
             cardView.findViewById<ImageButton>(R.id.ib_play_pause)
                 .setImageResource(R.drawable.ic_pause_icon)

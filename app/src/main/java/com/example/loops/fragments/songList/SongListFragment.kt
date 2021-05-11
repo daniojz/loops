@@ -1,24 +1,33 @@
 package com.example.loops.fragments.songList
 
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.provider.MediaStore
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.selection.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.loops.R
 import com.example.loops.adapter.CustomAdapterSongList
 import com.example.loops.model.Song
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import java.io.File
 
 
-class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClickListener, CustomAdapterSongList.OnSongListener {
+class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClickListener, CustomAdapterSongList.OnSongListener, MenuItem.OnMenuItemClickListener {
 
     private lateinit var songsListViewModel: SongListViewModel
 
@@ -31,12 +40,17 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
 
     private lateinit var adapter: CustomAdapterSongList
 
+    private lateinit var storageReference: StorageReference
+    private lateinit var auth: FirebaseAuth
+    private lateinit var storage: FirebaseFirestore
+    private lateinit var database: FirebaseDatabase
+
     private var editMode = false
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         fragmentView = inflater.inflate(R.layout.fragment_songlist, container, false)
         (activity as AppCompatActivity?)!!.setSupportActionBar(fragmentView.findViewById(R.id.toolbar_songFragment))
@@ -51,6 +65,11 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
     }
 
     private fun init() {
+        auth = FirebaseAuth.getInstance()
+        storage = FirebaseFirestore.getInstance()
+        database = FirebaseDatabase.getInstance()
+        storageReference = FirebaseStorage.getInstance().reference
+
         setAdapter()
 
         songsListViewModel = ViewModelProvider(this).get(SongListViewModel::class.java)
@@ -59,12 +78,24 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_song_list, menu)
-        val menuItem = menu.findItem(R.id.search_song)
+        val searchItem = menu.findItem(R.id.search_song)
+        val deleteItem = menu.findItem(R.id.delete_song)
+        val uploadItem = menu.findItem(R.id.upload_song)
 
-        if (menuItem != null) {
-            val searchView = menuItem.actionView as SearchView
-            searchView.setQueryHint("Search...")
+        if (searchItem != null) {
+            val searchView = searchItem.actionView as SearchView
+            searchView.setQueryHint("Buscar...")
             searchView.setOnQueryTextListener(this)
+        }
+
+        deleteItem.also {
+            it.isVisible=false
+            it.setOnMenuItemClickListener(this)
+        }
+
+        uploadItem.also {
+            it.isVisible=false
+            it.setOnMenuItemClickListener(this)
         }
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -73,7 +104,9 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
     override fun onQueryTextSubmit(query: String?): Boolean {
         val original = songsListViewModel.getListSongs().value
         if (original != null && query != null) {
-            adapter.setSongs(original.filter { song -> song.title.toUpperCase().contains(query.toUpperCase()) })
+            adapter.setSongs(original.filter { song ->
+                song.title.toUpperCase().contains(query.toUpperCase())
+            })
         }
         return false
     }
@@ -81,7 +114,9 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
     override fun onQueryTextChange(newText: String?): Boolean {
         val original = songsListViewModel.getListSongs().value
         if (original != null && newText != null) {
-            adapter.setSongs(original.filter { song -> song.title.toUpperCase().contains(newText.toUpperCase()) })
+            adapter.setSongs(original.filter { song ->
+                song.title.toUpperCase().contains(newText.toUpperCase())
+            })
         }
         return false
     }
@@ -117,12 +152,27 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
     }
 
 
-    override fun onClick(p0: View?) {
+    override fun onClick(v: View?) {
     }
 
+    override fun onMenuItemClick(menuItem: MenuItem?): Boolean {
+        if (menuItem != null) {
+            when(menuItem.itemId) {
+                R.id.upload_song -> uploadSongs()
+                R.id.delete_song -> deleteSongs()
+            }
+            return true
+        }
+        return false
+    }
 
     private fun setAdapter() {
-        adapter = activity?.let { CustomAdapterSongList(it.applicationContext, this, R.layout.custom_card_song, this) }!!
+        adapter = activity?.let { CustomAdapterSongList(
+            it.applicationContext,
+            this,
+            R.layout.custom_card_song,
+            this
+        ) }!!
         recyclerView.layoutManager = LinearLayoutManager(fragmentView.context)
         recyclerView.adapter = adapter
     }
@@ -153,9 +203,55 @@ class SongListFragment : Fragment(), SearchView.OnQueryTextListener, View.OnClic
         }
     }
 
-    fun uploadSongs(){
-        val emailAuth = FirebaseAuth.getInstance().currentUser.email
+    private fun uploadSongs(){
+        selectedSongsList.forEach(){
+            var songUri = it.contentUri.toUri()
+            var songStream  = fragmentView.context.contentResolver.openInputStream(songUri)!!
+            val userMusicRef = storageReference.child((auth.currentUser.displayName.toString() + "/music/${songUri.lastPathSegment}"))
+
+            userMusicRef.putStream(songStream).also {
+                it.addOnFailureListener{
+                    checkUploadingSongs(false)
+                }
+
+                it.addOnCompleteListener {
+                    checkUploadingSongs(true)
+                }
+            }
+
+
+        }
     }
+
+    private fun deleteSongs(){
+
+    }
+
+    private fun checkUploadingSongs(response: Boolean) {
+        var uploadFiles = 0
+        var failureFiles = 0
+
+        if (uploadFiles + failureFiles < selectedSongsList.size) {
+            if (response) uploadFiles++ else failureFiles++
+        }
+
+        if (uploadFiles == selectedSongsList.size) {
+            showAlert("Se han subido todos los archivos...")
+        } else if (uploadFiles + failureFiles == selectedSongsList.size) {
+            showAlert("Hay " + uploadFiles + " archivos que no se han subido correctamente")
+        }
+    }
+
+    private fun showAlert(message: String){
+        val builder = AlertDialog.Builder(fragmentView.context)
+        builder.setTitle("Operacion terminada")
+        builder.setMessage(message)
+        builder.setPositiveButton("Aceptar", null)
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+
+
 
 
 }

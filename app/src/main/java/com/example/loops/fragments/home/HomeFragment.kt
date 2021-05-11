@@ -28,26 +28,18 @@ class HomeFragment : Fragment() {
     ): View? {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         fragmentView = inflater.inflate(R.layout.fragment_home, container, false)
-        val textView: TextView = fragmentView.findViewById(R.id.text_home_welcome)
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
+        val text_home_welcome: TextView = fragmentView.findViewById(R.id.text_home_welcome)
 
-        init()
+
+        if (FirebaseAuth.getInstance().currentUser!=null){
+            text_home_welcome.text = "Buenos dias " + FirebaseAuth.getInstance().currentUser.displayName + "..."
+        } else {
+            text_home_welcome.text = "Buenos dias..."
+        }
+
         return fragmentView
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    fun init(){
-        if (FirebaseAuth.getInstance().currentUser!=null){
-            fragmentView.findViewById<TextView>(R.id.text_home_welcome).text = "Buenos dias " + FirebaseAuth.getInstance().currentUser.displayName + "..."
-        } else {
-            fragmentView.findViewById<TextView>(R.id.text_home_welcome).text = "Buenos dias..."
-        }
-    }
 
 
 

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.loops.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -39,13 +40,12 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
             email,
             password).addOnCompleteListener {
             if (it.isSuccessful){
-                //registerUserStorage(username, email)
+                registerUserStorage(username, email, firstName, surname, lastName)
 
-                val currentUserDb = database.reference.child("Users").child(auth.currentUser.uid)
-                currentUserDb.child("username").setValue(username)
-                currentUserDb.child("firstName").setValue(firstName)
-                currentUserDb.child("surname").setValue(surname)
-                currentUserDb.child("lastName").setValue(lastName)
+                val profileUpdate = UserProfileChangeRequest.Builder().setDisplayName(username).build()
+                auth.currentUser.updateProfile(profileUpdate).addOnCompleteListener{
+                    if(it.isSuccessful) finishSuccessful()
+                }
 
             } else {
                 showAlert("Se ha producirdo un error al registrar el usuario")
@@ -53,25 +53,27 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun registerUserStorage(username: String, email: String){
+    private fun registerUserStorage(username: String, email: String, firstName: String, surname: String, lastName: String){
         storage.collection("users").document(email).set(
-            "user" to username
+                hashMapOf("user" to username,
+                        "firstName" to firstName,
+                        "surname" to surname,
+                        "lastName" to lastName,
+                        )
         ).addOnCompleteListener{
             if (it.isSuccessful){
                 this.findViewById<TextView>(R.id.tv_message_register).also {
                     it.text = "Se ha registrado correctamente!"
                 }
-                successFinish(username)
             } else {
                 showAlert("Se ha producirdo un error al añadir el usuario a al base de datos")
             }
         }
     }
 
-    private fun successFinish(username: String) {
-        val intent = Intent()
-        intent.putExtra("userName", username)
-        setResult(RESULT_OK, intent)
+    private fun finishSuccessful(){
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
         finish()
     }
 
@@ -86,9 +88,9 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         this.findViewById<TextView>(R.id.tv_message_register).text = ""
-        var email = this.findViewById<TextView>(R.id.et_email).text
-        var password = this.findViewById<TextView>(R.id.et_password).text
-        var username = this.findViewById<TextView>(R.id.et_password).text
+        val email = this.findViewById<TextView>(R.id.et_email).text
+        val password = this.findViewById<TextView>(R.id.et_password).text
+        val username = this.findViewById<TextView>(R.id.et_username).text
         var name = this.findViewById<TextView>(R.id.et_name).text
         var surname = this.findViewById<TextView>(R.id.et_surname).text
         var lastname = this.findViewById<TextView>(R.id.et_lastname).text
@@ -98,8 +100,8 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
                 if (username.isNotEmpty() && password.isNotEmpty()) {
 
                     if(name.isBlank()) name="none"
-                    if(surname.isBlank()) name="none"
-                    if(lastname.isBlank()) name="none"
+                    if(surname.isBlank()) surname="none"
+                    if(lastname.isBlank()) lastname="none"
 
                     registerUser(email.toString(), password.toString(), username.toString(), name.toString(), surname.toString(), lastname.toString())
                 } else {
